@@ -23,9 +23,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("WebLocal", policy =>
     {
-        policy.WithOrigins(
-                "http://127.0.0.1:5500",
-                "http://localhost:5500")
+        // Giao dien HTML co the mo tren may khac; API xac thuc bang Bearer JWT.
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -116,6 +115,7 @@ app.UseCors("WebLocal");
 
 // Dat TRUOC app.MapControllers().
 // Moi tep trong wwwroot la CONG KHAI: ai biet dia chi deu tai duoc (Giao trinh 7.6.3).
+app.UseDefaultFiles();
 app.UseStaticFiles();
 
 // =============================================================
