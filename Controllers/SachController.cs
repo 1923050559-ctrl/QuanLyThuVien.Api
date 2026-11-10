@@ -12,11 +12,10 @@ namespace QuanLyThuVien.Api.Controllers;
 /// <summary>
 /// Quan ly tai nguyen Sach - LAB 6: BAT DONG BO va INCLUDE.
 /// LAB 7: tai anh bia theo QUY TRINH SAU BUOC, thay the anh, don tep khi xoa sach.
-/// LAB 8: BAO VE ENDPOINT theo bang quyet dinh (Giao trinh 8.7.2):
-///   - GET danh sach, GET chi tiet : CONG KHAI - danh muc sach ai cung xem duoc
-///   - POST, PUT, DELETE, tai anh bia: [Authorize] - thao tac GHI du lieu
-/// [Authorize] dat tren TUNG ACTION (khong dat tren lop) vi lop nay co ca action cong khai.
-/// LAB 9: Delete thu hep thanh [Authorize(Roles = "Admin")] - phan quyen theo VAI TRO (Giao trinh 9.1).
+/// LAB 8 va 9: BAO VE ENDPOINT theo nghiep vu thu vien thuc te:
+///   - GET danh sach, GET chi tiet : CONG KHAI ([AllowAnonymous]) - danh muc sach ai cung xem duoc
+///   - POST, PUT, DELETE, tai anh bia: CHI Admin ([Authorize(Roles = "Admin")])
+/// [Authorize(Roles = "Admin")] dat tren TUNG ACTION (khong dat tren lop) vi lop nay co ca action cong khai.
 ///   Nhan ILogger ghi log thao tac GHI (Giao trinh 9.3). Chi ghi MA, khong ghi du lieu ca nhan.
 /// </summary>
 [ApiController]
@@ -65,6 +64,7 @@ public class SachController : ControllerBase
     /// <param name="pageNumber">Trang thu may, dem tu 1</param>
     /// <param name="pageSize">So ban ghi moi trang, toi da 100</param>
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
         [FromQuery] string? tuKhoa,
@@ -153,6 +153,7 @@ public class SachController : ControllerBase
 
     /// <summary>Lay thong tin mot cuon sach theo ma.</summary>
     [HttpGet("{id:int}")]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] int id)
@@ -166,11 +167,12 @@ public class SachController : ControllerBase
         return Ok(ToDto(sach));
     }
 
-    /// <summary>Them mot cuon sach moi.</summary>
+    /// <summary>Them mot cuon sach moi. CHI ADMIN duoc phep.</summary>
     [HttpPost]
+    [Authorize(Roles = "Admin")]    // CHI Admin duoc them sach
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [Authorize]                     // LAB 8 - thao tac GHI: tao moi
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] SachCreateDto dto)
     {
@@ -196,10 +198,11 @@ public class SachController : ControllerBase
             new { id = sach.MaSach }, ToDto(sach));
     }
 
-    /// <summary>Cap nhat thong tin mot cuon sach.</summary>
+    /// <summary>Cap nhat thong tin mot cuon sach. CHI ADMIN duoc phep.</summary>
     [HttpPut("{id:int}")]
-    [Authorize]                     // LAB 8 - thao tac GHI: cap nhat
+    [Authorize(Roles = "Admin")]    // CHI Admin duoc sua sach
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -230,7 +233,7 @@ public class SachController : ControllerBase
     /// LAB 7: sach co anh bia thi xoa luon tep anh SAU KHI xoa ban ghi thanh cong (Giao trinh 7.8.3).
     /// </remarks>
     [HttpDelete("{id:int}")]
-    [Authorize (Roles = "Admin")]    // TODO 1a (Buoc 1): CHI Admin duoc xoa sach -> them tham so Roles vao Authorize (Giao trinh 9.1.3)
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -269,8 +272,9 @@ public class SachController : ControllerBase
     /// <param name="id">Ma sach</param>
     /// <param name="file">Tep anh. Ten tham so PHAI trung voi KEY ben Postman: file</param>
     [HttpPost("{id:int}/anh-bia")]
-    [Authorize]                     // LAB 8 - thao tac GHI: ghi tep + cap nhat CSDL
+    [Authorize(Roles = "Admin")]    // CHI Admin duoc tai/thay anh bia sach
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(SachResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

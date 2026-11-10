@@ -39,6 +39,7 @@ public class AuthController : ControllerBase
     /// Sai ten HOAC sai mat khau deu tra 401 voi CUNG MOT thong bao.
     /// </remarks>
     [HttpPost("dang-nhap")]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -77,6 +78,7 @@ public class AuthController : ControllerBase
     /// ngan chan viec tu cap quyen Admin qua over-posting.
     /// </remarks>
     [HttpPost("dang-ky")]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DangKy([FromBody] DangKyDto dto)

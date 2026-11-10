@@ -13,11 +13,11 @@ namespace QuanLyThuVien.Api.Controllers;
 ///
 ///   GET    /api/tacgia          Danh sach, loc theo ten, phan trang   CONG KHAI
 ///   GET    /api/tacgia/{id}     Chi tiet                              CONG KHAI
-///   POST   /api/tacgia          Them moi                              [Authorize]
-///   PUT    /api/tacgia/{id}     Cap nhat                              [Authorize]
+///   POST   /api/tacgia          Them moi                              CHI Admin
+///   PUT    /api/tacgia/{id}     Cap nhat                              CHI Admin
 ///   DELETE /api/tacgia/{id}     Xoa                                   CHI Admin
 ///
-/// [Authorize] dat tren TUNG ACTION (khong dat tren lop) vi lop nay co ca action cong khai.
+/// [Authorize(Roles = "Admin")] dat tren TUNG ACTION (khong dat tren lop) vi lop nay co ca action cong khai.
 /// </summary>
 [ApiController]
 [Route("api/tacgia")]
@@ -40,6 +40,7 @@ public class TacGiaController : ControllerBase
     /// <param name="pageNumber">Trang thu may, dem tu 1</param>
     /// <param name="pageSize">So ban ghi moi trang, toi da 100</param>
     [HttpGet]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
         [FromQuery] string? tuKhoa,
@@ -85,6 +86,7 @@ public class TacGiaController : ControllerBase
 
     /// <summary>Lay thong tin mot tac gia theo ma.</summary>
     [HttpGet("{id:int}")]
+    [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] int id)
@@ -97,12 +99,13 @@ public class TacGiaController : ControllerBase
         return Ok(ToDto(tacGia));
     }
 
-    /// <summary>Them mot tac gia moi.</summary>
+    /// <summary>Them mot tac gia moi. CHI ADMIN duoc phep.</summary>
     [HttpPost]
-    [Authorize]                     // thao tac GHI: tao moi
+    [Authorize(Roles = "Admin")]    // CHI Admin duoc them tac gia
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> Create([FromBody] TacGiaCreateDto dto)
     {
         var tacGia = ToEntity(dto);
@@ -116,12 +119,13 @@ public class TacGiaController : ControllerBase
             new { id = tacGia.MaTacGia }, ToDto(tacGia));
     }
 
-    /// <summary>Cap nhat thong tin mot tac gia.</summary>
+    /// <summary>Cap nhat thong tin mot tac gia. CHI ADMIN duoc phep.</summary>
     [HttpPut("{id:int}")]
-    [Authorize]                     // thao tac GHI: cap nhat
+    [Authorize(Roles = "Admin")]    // CHI Admin duoc sua tac gia
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update([FromRoute] int id, [FromBody] TacGiaUpdateDto dto)
     {

@@ -301,7 +301,6 @@ public class PhieuMuonController : ControllerBase
     /// </remarks>
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin")]
-    // TODO 1b (Buoc 1): CHI Admin duoc xoa phieu muon -> them [Authorize(Roles = "Admin")] ngay tren dong nay
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
